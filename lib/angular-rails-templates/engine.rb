@@ -31,6 +31,16 @@ module AngularRailsTemplates
           # These engines render markup as HTML
           app.config.angular_templates.markups.each do |ext|
             env.register_engine ".#{ext}", Tilt[ext]
+            
+            # Add helpers into the Scopes of the supported templates
+            def render(scope=Object.new, locals={}, &block)
+              scope.class_eval do
+                include ApplicationHelper
+                include ActionView::Helpers
+                include Rails.application.routes.url_helpers
+              end
+              super scope, locals || {}, &block
+            end
           end
         end
       end
